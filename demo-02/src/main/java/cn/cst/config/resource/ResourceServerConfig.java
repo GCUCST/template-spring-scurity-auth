@@ -16,34 +16,33 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
-    @Autowired
-    TokenStore tokenStore;
+  @Autowired TokenStore tokenStore;
 
-    @Override
-    public void configure(ResourceServerSecurityConfigurer resources) {
-        //自定义资源访问认证异常，没有token，或token错误，使用MyAuthenticationEntryPoint
-        resources.authenticationEntryPoint(new MyAuthenticationEntryPoint());
-        resources.accessDeniedHandler(new MyAccessDeniedHandler());
+  @Override
+  public void configure(ResourceServerSecurityConfigurer resources) {
+    // 自定义资源访问认证异常，没有token，或token错误，使用MyAuthenticationEntryPoint
+    resources.authenticationEntryPoint(new MyAuthenticationEntryPoint());
+    resources.accessDeniedHandler(new MyAccessDeniedHandler());
 
-        resources.resourceId("res1").tokenStore(tokenStore).stateless(true);
-    }
+    resources.resourceId("res1").tokenStore(tokenStore).stateless(true);
+  }
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
+  @Override
+  public void configure(HttpSecurity http) throws Exception {
 
-        http.authorizeRequests()
-                .antMatchers("/api/auth/**")
-                .permitAll()
-                .antMatchers("/actuator/**", "/captcha/getCaptcha", "/captcha/checkCaptcha")
-                .authenticated()
-                .and()
-                .csrf()
-                .disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    http.authorizeRequests()
+        .antMatchers("/api/auth/**")
+        .permitAll()
+        .antMatchers("/actuator/**", "/captcha/getCaptcha", "/captcha/checkCaptcha")
+        .authenticated()
+        .and()
+        .csrf()
+        .disable()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        //配置一个登录前的过滤器
-        http.addFilterBefore(
-                new TokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-    }
+    // 配置一个登录前的过滤器
+    http.addFilterBefore(
+        new TokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+  }
 }

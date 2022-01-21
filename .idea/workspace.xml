@@ -5,9 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b3eabb4-4e57-40c5-a424-0d2a9952d503" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo-01/src/main/java/cn/cst/config/WebConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/demo-01/src/main/java/cn/cst/config/WebConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo-02/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/demo-02/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo-02/src/main/java/cn/cst/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/demo-02/src/main/java/cn/cst/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo-02/src/main/java/cn/cst/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/demo-02/src/main/java/cn/cst/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,7 +125,8 @@
       <updated>1632810484458</updated>
       <workItem from="1632810487698" duration="4596000" />
       <workItem from="1632815641488" duration="8163000" />
-      <workItem from="1632824029078" duration="1688000" />
+      <workItem from="1632824029078" duration="1948000" />
+      <workItem from="1642763881775" duration="1986000" />
     </task>
     <servers />
   </component>
@@ -138,6 +143,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -154,7 +160,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/demo-02/src/main/java/cn/cst/exception/GlobalExceptionHandler.java</url>
-          <line>13</line>
+          <line>11</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
       </breakpoints>

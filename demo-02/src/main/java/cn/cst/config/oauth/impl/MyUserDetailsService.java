@@ -9,15 +9,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if (username.equals("cst")) {
-            UserDetails userDetails =
-                    User.withUsername("cst")
-                            .password(new BCryptPasswordEncoder().encode("123"))
-                            .authorities("p1")
-                            .build();
-            return userDetails;
-        } else return null;
-    }
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    if (username.equals("cst")) {
+      UserDetails userDetails =
+          User.withUsername("cst")
+              .password(new BCryptPasswordEncoder().encode("123"))
+              .authorities("p1")
+              .build();
+      return userDetails;
+    } else return null;
+  }
 }

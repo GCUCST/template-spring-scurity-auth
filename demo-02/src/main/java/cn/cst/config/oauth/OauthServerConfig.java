@@ -1,6 +1,7 @@
 package cn.cst.config.oauth;
 
 import cn.cst.exception.MyOauthExceptionHandler;
+import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +23,6 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
-import java.util.Arrays;
-
 // 三大配置
 // 1.根据oauth，客户端访问授权服务器需要有一个身份，即 客户端详情
 // 2.令牌访问端点，即 token访问的地址和类型
@@ -32,77 +31,67 @@ import java.util.Arrays;
 @Configuration
 public class OauthServerConfig extends AuthorizationServerConfigurerAdapter {
 
+  @Autowired TokenStore tokenStore;
+  @Autowired ClientDetailsService clientDetailsService;
+  @Autowired AuthenticationManager authenticationManager;
+  @Autowired JwtAccessTokenConverter accessTokenConverter;
+  @Autowired AuthorizationCodeServices authorizationCodeServices;
 
-    @Autowired
-    TokenStore tokenStore;
-    @Autowired
-    ClientDetailsService clientDetailsService;
-    @Autowired
-    AuthenticationManager authenticationManager;
-    @Autowired
-    JwtAccessTokenConverter accessTokenConverter;
-    @Autowired
-    AuthorizationCodeServices authorizationCodeServices;
+  @Bean
+  public AuthorizationCodeServices authorizationCodeServices() {
+    return new InMemoryAuthorizationCodeServices();
+  }
 
-    @Bean
-    public AuthorizationCodeServices authorizationCodeServices() {
-        return new InMemoryAuthorizationCodeServices();
-    }
+  @Bean
+  public AuthorizationServerTokenServices tokenServices() {
+    DefaultTokenServices services = new DefaultTokenServices();
+    services.setClientDetailsService(clientDetailsService); // 客户端信息服务
+    services.setSupportRefreshToken(false); // 产生刷新令牌
+    services.setTokenStore(tokenStore); // 令牌存储方案
+    TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+    tokenEnhancerChain.setTokenEnhancers(Arrays.asList(accessTokenConverter));
+    services.setTokenEnhancer(tokenEnhancerChain);
+    services.setAccessTokenValiditySeconds(7200); // 令牌默认有效期
+    services.setRefreshTokenValiditySeconds(259200); // 刷新令牌有效期
+    return services;
+  }
 
-    @Bean
-    public AuthorizationServerTokenServices tokenServices() {
-        DefaultTokenServices services = new DefaultTokenServices();
-        services.setClientDetailsService(clientDetailsService); //客户端信息服务
-        services.setSupportRefreshToken(false); //产生刷新令牌
-        services.setTokenStore(tokenStore); //令牌存储方案
-        TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-        tokenEnhancerChain.setTokenEnhancers(Arrays.asList(accessTokenConverter));
-        services.setTokenEnhancer(tokenEnhancerChain);
-        services.setAccessTokenValiditySeconds(7200);//令牌默认有效期
-        services.setRefreshTokenValiditySeconds(259200);//刷新令牌有效期
-        return services;
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
+  @Override
+  public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+    clients
+        .inMemory()
+        .withClient("c1")
+        .secret(new BCryptPasswordEncoder().encode("secret"))
+        .resourceIds("res1")
+        .authorizedGrantTypes(
+            "authorization_code", "password", "client_credentials", "implicit", "refresh_token")
+        .scopes("all")
+        .autoApprove(false) // 会跳转到授权页面
+        .redirectUris("https://www.baidu.com");
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Override
+  public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
+    // 自定义 /oauth/token 异常处理
+    endpoints
+        .exceptionTranslator(new MyOauthExceptionHandler())
+        .authenticationManager(authenticationManager)
+        .authorizationCodeServices(authorizationCodeServices)
+        .tokenServices(tokenServices())
+        .allowedTokenEndpointRequestMethods(HttpMethod.GET);
+  }
 
-
-    @Override
-    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients
-                .inMemory()
-                .withClient("c1")
-                .secret(new BCryptPasswordEncoder().encode("secret"))
-                .resourceIds("res1")
-                .authorizedGrantTypes(
-                        "authorization_code", "password", "client_credentials", "implicit", "refresh_token")
-                .scopes("all")
-                .autoApprove(false) // 会跳转到授权页面
-                .redirectUris("https://www.baidu.com");
-    }
-
-    @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
-        //自定义 /oauth/token 异常处理
-        endpoints.exceptionTranslator(new MyOauthExceptionHandler())
-                .authenticationManager(authenticationManager)
-                .authorizationCodeServices(authorizationCodeServices)
-                .tokenServices(tokenServices())
-                .allowedTokenEndpointRequestMethods(HttpMethod.GET);
-    }
-
-    @Override
-    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-        security
-                .tokenKeyAccess("permitAll()")
-                .checkTokenAccess("permitAll()")
-                .allowFormAuthenticationForClients();
-        security.addTokenEndpointAuthenticationFilter(new LoginAuthenticationFilter());
-    }
-
-
+  @Override
+  public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+    security
+        .tokenKeyAccess("permitAll()")
+        .checkTokenAccess("permitAll()")
+        .allowFormAuthenticationForClients();
+    security.addTokenEndpointAuthenticationFilter(new LoginAuthenticationFilter());
+  }
 }
-
